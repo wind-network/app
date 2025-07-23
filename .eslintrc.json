@@ -1,0 +1,33 @@
+{
+    "extends": [
+      "next/core-web-vitals",
+      "next/typescript"
+    ],
+    "rules": {
+      "prefer-const": "error",
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": ["error", { 
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }],
+      "@typescript-eslint/no-explicit-any": "warn",
+      "react-hooks/exhaustive-deps": "warn",
+      "react/display-name": "off",
+      "@next/next/no-img-element": "error",
+      "@next/next/no-html-link-for-pages": "error"
+    },
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "ecmaVersion": 2022,
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "jsx": true
+      }
+    },
+    "env": {
+      "browser": true,
+      "es2022": true,
+      "node": true
+    }
+  }
