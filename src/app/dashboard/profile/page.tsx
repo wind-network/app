@@ -106,7 +106,7 @@ export default function ProfilePage() {
                     </label>
                     <input
                       type="text"
-                      defaultValue={getUserDisplayName()}
+                      defaultValue={getUserDisplayName() || ''}
                       className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-blue-500"
                     />
                   </div>
