@@ -155,7 +155,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                       <img src={getUserAvatar()!} alt="Avatar" className="w-8 h-8 rounded-full" />
                     ) : (
                       <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-sm font-bold">
-                        {getUserDisplayName().charAt(0).toUpperCase()}
+                        {getUserDisplayName()?.charAt(0)?.toUpperCase() || 'U'}
                       </div>
                     )}
                     <span className="hidden md:block text-sm text-white">{getUserDisplayName()}</span>
