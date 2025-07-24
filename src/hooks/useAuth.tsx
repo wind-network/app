@@ -48,8 +48,8 @@ export function useAuth(requireAuth = false) {
   const getUserAvatar = () => {
     if (!user) return null
     
-    if (user.google?.profilePictureUrl) return user.google.profilePictureUrl
-    if (user.github?.profilePictureUrl) return user.github.profilePictureUrl
+    if ((user as any).google?.profilePictureUrl) return (user as any).google.profilePictureUrl
+    if ((user as any).github?.profilePictureUrl) return (user as any).github.profilePictureUrl
     
     return null
   }

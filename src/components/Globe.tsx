@@ -126,8 +126,11 @@ function Atmosphere() {
   }), [])
   
   useFrame(({ clock }) => {
-    if (atmosphereRef.current && atmosphereRef.current.material.uniforms) {
-      atmosphereRef.current.material.uniforms.time.value = clock.getElapsedTime()
+    if (atmosphereRef.current && atmosphereRef.current.material) {
+      const material = atmosphereRef.current.material as THREE.ShaderMaterial
+      if ('uniforms' in material && material.uniforms) {
+        material.uniforms.time.value = clock.getElapsedTime()
+      }
     }
   })
   
@@ -174,7 +177,7 @@ function PeerNode({ peer }: { peer: PeerNode }) {
 
 // Connection line component
 function ConnectionLine({ connection }: { connection: Connection }) {
-  const lineRef = useRef<THREE.Line>(null)
+  const lineRef = useRef<any>(null)
   
   const points = useMemo(() => {
     const curve = new THREE.CatmullRomCurve3([
@@ -187,8 +190,9 @@ function ConnectionLine({ connection }: { connection: Connection }) {
   }, [connection])
   
   useFrame(({ clock }) => {
-    if (lineRef.current) {
-      lineRef.current.material.opacity = 0.2 + Math.sin(clock.getElapsedTime() * 2) * 0.1
+    if (lineRef.current && lineRef.current.material) {
+      const material = lineRef.current.material as THREE.LineBasicMaterial
+      material.opacity = 0.2 + Math.sin(clock.getElapsedTime() * 2) * 0.1
     }
   })
   
@@ -200,6 +204,7 @@ function ConnectionLine({ connection }: { connection: Connection }) {
           count={points.length}
           array={Float32Array.from(points.flatMap(p => [p.x, p.y, p.z]))}
           itemSize={3}
+          args={[Float32Array.from(points.flatMap(p => [p.x, p.y, p.z])), 3]}
         />
       </bufferGeometry>
       <lineBasicMaterial
