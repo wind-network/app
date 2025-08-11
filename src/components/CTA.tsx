@@ -157,7 +157,7 @@ export function CTA() {
         >
           <p className="text-slate-400 mb-8">Trusted by developers at</p>
           <div className="flex flex-wrap justify-center items-center gap-12 opacity-50">
-            {/* Placeholder for company logos */}
+            {/* Company logos - can be fetched from API if needed */}
             {['Solana Labs', 'Metaplex', 'Jupiter', 'Magic Eden', 'Phantom'].map((company, idx) => (
               <motion.div
                 key={company}

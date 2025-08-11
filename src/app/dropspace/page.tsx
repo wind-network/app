@@ -1,15 +1,13 @@
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
-import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { useState } from 'react'
 import Link from 'next/link'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 
 export default function DropSpacePage() {
   const [activeDemo, setActiveDemo] = useState(0)
-  const [dragActive, setDragActive] = useState(false)
-  
   // Jupiter-themed animations
   const jupiterColors = {
     storms: ['#D4A574', '#C19660', '#8B6239', '#A0522D'],

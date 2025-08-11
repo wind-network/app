@@ -35,7 +35,7 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Welcome back, {getUserDisplayName()}</h1>
-          <p className="text-slate-400">Here's what's happening with your Wind Network services.</p>
+          <p className="text-slate-400">Here&apos;s what&apos;s happening with your Wind Network services.</p>
         </div>
 
         {/* Stats Grid */}

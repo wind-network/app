@@ -5,7 +5,7 @@ import { DashboardLayout } from '@/components/DashboardLayout'
 import { useState } from 'react'
 
 export default function WindSpaceDashboard() {
-  const [uploadProgress, setUploadProgress] = useState(0)
+  const [uploadProgress] = useState(0)
   
   const storageStats = [
     { label: 'Total Storage', value: '10 GB', used: '2.5 GB', percentage: 25 },

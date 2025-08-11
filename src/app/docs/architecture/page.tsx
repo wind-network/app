@@ -4,7 +4,6 @@ import { motion } from 'framer-motion'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { DocsLayout } from '@/components/DocsLayout'
-import Image from 'next/image'
 
 export default function ArchitecturePage() {
   return (

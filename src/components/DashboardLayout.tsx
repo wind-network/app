@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -21,7 +21,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { user, authenticated, ready, login, logout, getUserDisplayName, getUserAvatar } = useAuth(true)
+  const { user, authenticated, login, logout, getUserDisplayName, getUserAvatar } = useAuth(true)
 
   const navItems: DashboardNavItem[] = [
     {

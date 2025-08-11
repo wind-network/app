@@ -5,7 +5,7 @@ import { DashboardLayout } from '@/components/DashboardLayout'
 import { useState } from 'react'
 
 export default function BillingPage() {
-  const [selectedPlan, setSelectedPlan] = useState('developer')
+  const [, setSelectedPlan] = useState('developer')
 
   const plans = [
     {

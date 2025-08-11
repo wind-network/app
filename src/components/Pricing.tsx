@@ -265,7 +265,7 @@ export function Pricing() {
                 </tr>
               </thead>
               <tbody>
-                {comparisonFeatures.map((category, index) => (
+                {comparisonFeatures.map((category) => (
                   <Fragment key={category.category}>
                     <tr>
                       <td colSpan={5} className="py-6 px-6">

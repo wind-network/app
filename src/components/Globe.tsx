@@ -4,6 +4,7 @@ import { useRef, useMemo, useEffect, useState } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Sphere, OrbitControls, Stars } from '@react-three/drei'
 import * as THREE from 'three'
+import { NetworkService, type PeerNode as NetworkPeerNode, type NetworkConnection } from '@/services/network'
 
 // Types
 interface PeerNode {
@@ -20,63 +21,54 @@ interface Connection {
   strength: number
 }
 
-// Generate random points on sphere surface
-function generateSpherePoint(radius: number): THREE.Vector3 {
-  const theta = Math.random() * Math.PI * 2
-  const phi = Math.acos(2 * Math.random() - 1)
+// Convert lat/lng to 3D sphere coordinates
+function latLngToVector3(lat: number, lng: number, radius: number): THREE.Vector3 {
+  const phi = (90 - lat) * (Math.PI / 180)
+  const theta = (lng + 180) * (Math.PI / 180)
   
-  const x = radius * Math.sin(phi) * Math.cos(theta)
-  const y = radius * Math.sin(phi) * Math.sin(theta)
-  const z = radius * Math.cos(phi)
+  const x = -radius * Math.sin(phi) * Math.cos(theta)
+  const y = radius * Math.cos(phi)
+  const z = radius * Math.sin(phi) * Math.sin(theta)
   
   return new THREE.Vector3(x, y, z)
 }
 
-// Generate mock peer data
-function generatePeers(count: number): PeerNode[] {
-  const types: Array<'storage' | 'compute' | 'relay'> = ['storage', 'compute', 'relay']
-  const names = [
-    'Tokyo Node', 'London Hub', 'NYC Relay', 'Singapore Storage',
-    'Frankfurt Compute', 'Sydney Node', 'Mumbai Hub', 'Toronto Relay',
-    'Paris Storage', 'Seoul Compute', 'Dubai Node', 'SF Hub',
-    'Berlin Relay', 'Moscow Storage', 'Rio Compute', 'Cairo Node',
-    'Stockholm Hub', 'Bangkok Relay', 'Madrid Storage', 'Vienna Compute'
-  ]
-  
-  return Array.from({ length: count }, (_, i) => ({
-    id: `peer-${i}`,
-    position: generateSpherePoint(2.5),
-    name: names[i % names.length],
-    type: types[Math.floor(Math.random() * types.length)],
-    active: Math.random() > 0.3
-  }))
+// Convert network peer to local peer format
+function convertNetworkPeer(peer: NetworkPeerNode, radius: number): PeerNode {
+  return {
+    id: peer.id,
+    position: latLngToVector3(peer.latitude, peer.longitude, radius),
+    name: peer.name,
+    type: peer.type,
+    active: peer.active
+  }
 }
 
-// Generate connections between peers
-function generateConnections(peers: PeerNode[]): Connection[] {
-  const connections: Connection[] = []
-  const maxConnections = 30
-  
-  for (let i = 0; i < maxConnections; i++) {
-    const fromIndex = Math.floor(Math.random() * peers.length)
-    const toIndex = Math.floor(Math.random() * peers.length)
-    
-    if (fromIndex !== toIndex && peers[fromIndex].active && peers[toIndex].active) {
-      connections.push({
-        from: peers[fromIndex],
-        to: peers[toIndex],
-        strength: Math.random()
-      })
-    }
-  }
-  
+// Generate connections from network data
+function convertNetworkConnections(
+  connections: NetworkConnection[], 
+  peers: Map<string, PeerNode>
+): Connection[] {
   return connections
+    .map(conn => {
+      const from = peers.get(conn.from)
+      const to = peers.get(conn.to)
+      
+      if (from && to && from.active && to.active) {
+        return {
+          from,
+          to,
+          strength: conn.strength
+        }
+      }
+      return null
+    })
+    .filter((conn): conn is Connection => conn !== null)
 }
 
 // Globe mesh component
 function GlobeMesh() {
   const meshRef = useRef<THREE.Mesh>(null)
-  const { viewport } = useThree()
   
   useFrame(({ clock }) => {
     if (meshRef.current) {
@@ -177,50 +169,93 @@ function PeerNode({ peer }: { peer: PeerNode }) {
 
 // Connection line component
 function ConnectionLine({ connection }: { connection: Connection }) {
-  const lineRef = useRef<any>(null)
+  const lineRef = useRef<THREE.Line>(null)
   
-  const points = useMemo(() => {
-    const curve = new THREE.CatmullRomCurve3([
+  const lineObject = useMemo(() => {
+    const points = [
       connection.from.position,
       connection.from.position.clone().multiplyScalar(1.3),
       connection.to.position.clone().multiplyScalar(1.3),
       connection.to.position
-    ])
-    return curve.getPoints(50)
+    ]
+    
+    const curve = new THREE.CatmullRomCurve3(points)
+    const curvePoints = curve.getPoints(50)
+    
+    const geometry = new THREE.BufferGeometry().setFromPoints(curvePoints)
+    const material = new THREE.LineBasicMaterial({
+      color: '#3b82f6',
+      transparent: true,
+      opacity: 0.3 * connection.strength,
+      blending: THREE.AdditiveBlending
+    })
+    
+    return new THREE.Line(geometry, material)
   }, [connection])
   
   useFrame(({ clock }) => {
     if (lineRef.current && lineRef.current.material) {
       const material = lineRef.current.material as THREE.LineBasicMaterial
-      material.opacity = 0.2 + Math.sin(clock.getElapsedTime() * 2) * 0.1
+      material.opacity = (0.3 * connection.strength) + Math.sin(clock.getElapsedTime() * 2) * 0.1
     }
   })
   
-  return (
-    <line ref={lineRef}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={points.length}
-          array={Float32Array.from(points.flatMap(p => [p.x, p.y, p.z]))}
-          itemSize={3}
-          args={[Float32Array.from(points.flatMap(p => [p.x, p.y, p.z])), 3]}
-        />
-      </bufferGeometry>
-      <lineBasicMaterial
-        color="#3b82f6"
-        transparent
-        opacity={0.3 * connection.strength}
-        blending={THREE.AdditiveBlending}
-      />
-    </line>
-  )
+  return <primitive ref={lineRef} object={lineObject} />
 }
 
 // Main scene component
 function GlobeScene() {
-  const peers = useMemo(() => generatePeers(50), [])
-  const connections = useMemo(() => generateConnections(peers), [peers])
+  const [peers, setPeers] = useState<PeerNode[]>([])
+  const [connections, setConnections] = useState<Connection[]>([])
+  
+  useEffect(() => {
+    let unsubscribe: (() => void) | null = null
+    
+    const loadNetworkData = async () => {
+      try {
+        const [networkPeers, networkConnections] = await Promise.all([
+          NetworkService.fetchPeers(),
+          NetworkService.fetchConnections()
+        ])
+        
+        const convertedPeers = networkPeers.map(p => convertNetworkPeer(p, 2.5))
+        const peerMap = new Map(convertedPeers.map(p => [p.id, p]))
+        const convertedConnections = convertNetworkConnections(networkConnections, peerMap)
+        
+        setPeers(convertedPeers)
+        setConnections(convertedConnections)
+        
+        // Subscribe to real-time updates
+        unsubscribe = NetworkService.subscribeToUpdates((data) => {
+          const updateData = data as { 
+            type: string
+            peers?: NetworkPeerNode[]
+            connections?: NetworkConnection[]
+          }
+          
+          if (updateData.type === 'peer_update' && updateData.peers) {
+            const updatedPeers = updateData.peers.map((p: NetworkPeerNode) => convertNetworkPeer(p, 2.5))
+            setPeers(updatedPeers)
+          }
+          if (updateData.type === 'connection_update' && updateData.connections) {
+            const peerMap = new Map(peers.map(p => [p.id, p]))
+            const updatedConnections = convertNetworkConnections(updateData.connections, peerMap)
+            setConnections(updatedConnections)
+          }
+        })
+      } catch (error) {
+        console.error('Failed to load network data:', error)
+      }
+    }
+    
+    loadNetworkData()
+    
+    return () => {
+      if (unsubscribe) {
+        unsubscribe()
+      }
+    }
+  }, [peers])
   
   return (
     <>
