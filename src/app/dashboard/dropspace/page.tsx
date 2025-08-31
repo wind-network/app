@@ -109,6 +109,14 @@ export default function DropSpaceDashboard() {
     }
   }
 
+  const handleDownload = async (shareId: string) => {
+    try {
+      await DropSpaceService.downloadFile(shareId)
+    } catch (error) {
+      console.error('Failed to download file:', error)
+    }
+  }
+
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto">
@@ -361,7 +369,22 @@ export default function DropSpaceDashboard() {
                         </div>
                       </td>
                       <td className="py-4 text-slate-300">{share.size}</td>
-                      <td className="py-4 text-slate-300">{share.shared}</td>
+                      <td className="py-4 text-slate-300">
+                        {(() => {
+                          const date = new Date(share.shared)
+                          const now = new Date()
+                          const diff = now.getTime() - date.getTime()
+                          const minutes = Math.floor(diff / 60000)
+                          const hours = Math.floor(diff / 3600000)
+                          const days = Math.floor(diff / 86400000)
+                          
+                          if (minutes < 1) return 'Just now'
+                          if (minutes < 60) return `${minutes} min ago`
+                          if (hours < 24) return `${hours}h ago`
+                          if (days < 7) return `${days}d ago`
+                          return date.toLocaleDateString()
+                        })()}
+                      </td>
                       <td className="py-4">
                         <span className={`text-sm ${
                           share.expires === 'Never' ? 'text-green-400' :
@@ -374,6 +397,15 @@ export default function DropSpaceDashboard() {
                       <td className="py-4 text-slate-300">{share.downloads}</td>
                       <td className="py-4">
                         <div className="flex items-center space-x-2">
+                          <button 
+                            onClick={() => handleDownload(share.id)}
+                            className="p-1 text-slate-400 hover:text-blue-400" 
+                            title="Download"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                            </svg>
+                          </button>
                           <button 
                             onClick={() => handleCopyLink(share.id)}
                             className="p-1 text-slate-400 hover:text-white" 

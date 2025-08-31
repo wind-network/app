@@ -107,3 +107,4 @@ temp/
 *.sw?
 
 .env
+.claude

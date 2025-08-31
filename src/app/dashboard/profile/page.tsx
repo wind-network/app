@@ -2,12 +2,105 @@
 
 import { motion } from 'framer-motion'
 import { DashboardLayout } from '@/components/DashboardLayout'
-import { useState } from 'react'
-import { useAuth } from '@/hooks/useAuth'
+import { useState, useEffect, useRef } from 'react'
+import { useSession } from 'next-auth/react'
+import { Camera, Mail, MapPin, Globe, Github, Twitter, Linkedin, Shield, Key, Bell, Loader2 } from 'lucide-react'
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('general')
-  const { user, getUserDisplayName, getUserEmail, getUserAvatar } = useAuth(true)
+  const { data: session, update } = useSession()
+  const [loading, setLoading] = useState(false)
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const [profileData, setProfileData] = useState({
+    name: '',
+    username: '',
+    bio: '',
+    location: '',
+    website: '',
+    socialLinks: {
+      github: '',
+      twitter: '',
+      linkedin: '',
+    }
+  })
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (session?.user) {
+      setProfileData({
+        name: session.user.name || '',
+        username: session.user.username || '',
+        bio: session.user.bio || '',
+        location: session.user.location || '',
+        website: session.user.website || '',
+        socialLinks: {
+          github: session.user.socialLinks?.github || '',
+          twitter: session.user.socialLinks?.twitter || '',
+          linkedin: session.user.socialLinks?.linkedin || '',
+        }
+      })
+    }
+  }, [session])
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingAvatar(true)
+    const formData = new FormData()
+    formData.append('avatar', file)
+
+    try {
+      const response = await fetch('/api/user/upload-avatar', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        await update() // Refresh session data
+        alert('Avatar uploaded successfully!')
+      } else {
+        alert('Failed to upload avatar')
+      }
+    } catch (error) {
+      console.error('Avatar upload error:', error)
+      alert('Failed to upload avatar')
+    } finally {
+      setUploadingAvatar(false)
+    }
+  }
+
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+
+    try {
+      const response = await fetch('/api/user/profile', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profileData),
+      })
+
+      if (response.ok) {
+        await update() // Refresh session data
+        alert('Profile updated successfully!')
+      } else {
+        alert('Failed to update profile')
+      }
+    } catch (error) {
+      console.error('Profile update error:', error)
+      alert('Failed to update profile')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const memberSince = session?.user?.createdAt 
+    ? new Date(session.user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    : new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 
   return (
     <DashboardLayout>
@@ -27,45 +120,75 @@ export default function ProfilePage() {
           <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
             {/* Avatar */}
             <div className="relative">
-              {getUserAvatar() ? (
+              {session?.user?.image ? (
                 <div className="w-32 h-32 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 p-1">
-                  <img src={getUserAvatar()!} alt="Profile" className="w-full h-full rounded-full object-cover" />
+                  <img 
+                    src={session.user.image} 
+                    alt="Profile" 
+                    className="w-full h-full rounded-full object-cover bg-slate-900" 
+                  />
                 </div>
               ) : (
                 <div className="w-32 h-32 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 p-1">
                   <div className="w-full h-full rounded-full bg-slate-900 flex items-center justify-center text-4xl font-bold text-white">
-                    {getUserDisplayName()?.charAt(0)?.toUpperCase() || 'U'}
+                    {session?.user?.name?.charAt(0)?.toUpperCase() || session?.user?.email?.charAt(0)?.toUpperCase() || 'U'}
                   </div>
                 </div>
               )}
-              <button className="absolute bottom-0 right-0 p-2 bg-blue-500 rounded-full text-white hover:bg-blue-600 transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarUpload}
+                className="hidden"
+              />
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingAvatar}
+                className="absolute bottom-0 right-0 p-2 bg-blue-500 rounded-full text-white hover:bg-blue-600 transition-colors disabled:opacity-50"
+              >
+                {uploadingAvatar ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Camera className="w-5 h-5" />
+                )}
               </button>
             </div>
 
             {/* Info */}
             <div className="flex-1 text-center md:text-left">
-              <h2 className="text-2xl font-bold text-white mb-2">{getUserDisplayName()}</h2>
-              <p className="text-slate-400 mb-4">{getUserEmail() || 'No email provided'}</p>
+              <h2 className="text-2xl font-bold text-white mb-2">
+                {session?.user?.name || session?.user?.email?.split('@')[0] || 'Anonymous User'}
+              </h2>
+              <p className="text-slate-400 mb-4">{session?.user?.email || 'No email provided'}</p>
               <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm">
-                <div>
+                <div className="flex items-center gap-1">
                   <span className="text-slate-400">Member since:</span>
-                  <span className="text-white ml-2">{new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+                  <span className="text-white">{memberSince}</span>
                 </div>
-                <div>
+                <div className="flex items-center gap-1">
                   <span className="text-slate-400">Plan:</span>
-                  <span className="text-blue-400 ml-2">Developer</span>
+                  <span className="text-blue-400">{session?.user?.plan?.displayName || 'Early Risers'}</span>
                 </div>
-                <div>
-                  <span className="text-slate-400">Auth method:</span>
-                  <span className="text-green-400 ml-2">
-                    {user?.wallet ? 'Wallet' : user?.email ? 'Email' : user?.google ? 'Google' : user?.github ? 'GitHub' : 'Unknown'}
-                  </span>
+                <div className="flex items-center gap-1">
+                  <span className="text-slate-400">Status:</span>
+                  <span className="text-green-400">{session?.user?.subscriptionStatus || 'Active'}</span>
                 </div>
               </div>
+              {session?.user?.location && (
+                <div className="flex items-center gap-2 mt-3 text-sm text-slate-400">
+                  <MapPin className="w-4 h-4" />
+                  <span>{session.user.location}</span>
+                </div>
+              )}
+              {session?.user?.website && (
+                <div className="flex items-center gap-2 mt-2 text-sm">
+                  <Globe className="w-4 h-4 text-slate-400" />
+                  <a href={session.user.website} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
+                    {session.user.website}
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </motion.div>
@@ -82,7 +205,7 @@ export default function ProfilePage() {
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {tab === 'api' ? 'API' : tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
           ))}
         </div>
@@ -98,7 +221,7 @@ export default function ProfilePage() {
           {activeTab === 'general' && (
             <div className="glass rounded-2xl p-8">
               <h3 className="text-xl font-semibold text-white mb-6">General Information</h3>
-              <form className="space-y-6">
+              <form onSubmit={handleProfileUpdate} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2">
@@ -106,20 +229,21 @@ export default function ProfilePage() {
                     </label>
                     <input
                       type="text"
-                      defaultValue={getUserDisplayName() || ''}
+                      value={profileData.name}
+                      onChange={(e) => setProfileData({...profileData, name: e.target.value})}
                       className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-blue-500"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2">
-                      Wallet Address
+                      Username
                     </label>
                     <input
                       type="text"
-                      defaultValue={user?.wallet?.address || ''}
-                      placeholder="Connect wallet to see address"
-                      disabled={!user?.wallet}
-                      className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-blue-500 disabled:opacity-50"
+                      value={profileData.username}
+                      onChange={(e) => setProfileData({...profileData, username: e.target.value})}
+                      placeholder="@username"
+                      className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -128,24 +252,48 @@ export default function ProfilePage() {
                   <label className="block text-sm font-medium text-slate-300 mb-2">
                     Email Address
                   </label>
-                  <input
-                    type="email"
-                    defaultValue={getUserEmail()}
-                    placeholder="No email address"
-                    disabled={!getUserEmail()}
-                    className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-blue-500 disabled:opacity-50"
-                  />
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-500" />
+                    <input
+                      type="email"
+                      value={session?.user?.email || ''}
+                      disabled
+                      className="w-full pl-10 pr-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-blue-500 disabled:opacity-50"
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Organization
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Your organization name"
-                    className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-blue-500"
-                  />
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      Location
+                    </label>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-500" />
+                      <input
+                        type="text"
+                        value={profileData.location}
+                        onChange={(e) => setProfileData({...profileData, location: e.target.value})}
+                        placeholder="City, Country"
+                        className="w-full pl-10 pr-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      Website
+                    </label>
+                    <div className="relative">
+                      <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-500" />
+                      <input
+                        type="url"
+                        value={profileData.website}
+                        onChange={(e) => setProfileData({...profileData, website: e.target.value})}
+                        placeholder="https://example.com"
+                        className="w-full pl-10 pr-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div>
@@ -154,16 +302,67 @@ export default function ProfilePage() {
                   </label>
                   <textarea
                     rows={4}
+                    value={profileData.bio}
+                    onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
                     placeholder="Tell us about yourself..."
                     className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-blue-500"
                   />
                 </div>
 
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-4">
+                    Social Links
+                  </label>
+                  <div className="space-y-4">
+                    <div className="relative">
+                      <Github className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-500" />
+                      <input
+                        type="text"
+                        value={profileData.socialLinks.github}
+                        onChange={(e) => setProfileData({
+                          ...profileData, 
+                          socialLinks: {...profileData.socialLinks, github: e.target.value}
+                        })}
+                        placeholder="github.com/username"
+                        className="w-full pl-10 pr-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                    <div className="relative">
+                      <Twitter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-500" />
+                      <input
+                        type="text"
+                        value={profileData.socialLinks.twitter}
+                        onChange={(e) => setProfileData({
+                          ...profileData, 
+                          socialLinks: {...profileData.socialLinks, twitter: e.target.value}
+                        })}
+                        placeholder="twitter.com/username"
+                        className="w-full pl-10 pr-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                    <div className="relative">
+                      <Linkedin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-500" />
+                      <input
+                        type="text"
+                        value={profileData.socialLinks.linkedin}
+                        onChange={(e) => setProfileData({
+                          ...profileData, 
+                          socialLinks: {...profileData.socialLinks, linkedin: e.target.value}
+                        })}
+                        placeholder="linkedin.com/in/username"
+                        className="w-full pl-10 pr-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="flex justify-end">
                   <button
                     type="submit"
-                    className="btn-primary"
+                    disabled={loading}
+                    className="btn-primary flex items-center gap-2 disabled:opacity-50"
                   >
+                    {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                     Save Changes
                   </button>
                 </div>
@@ -177,56 +376,34 @@ export default function ProfilePage() {
               <div>
                 <h3 className="text-xl font-semibold text-white mb-6">Security Settings</h3>
                 
-                {/* Change Password */}
-                <div className="mb-8">
-                  <h4 className="text-lg font-medium text-white mb-4">Change Password</h4>
-                  <form className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
-                        Current Password
-                      </label>
-                      <input
-                        type="password"
-                        className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-blue-500"
-                      />
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                          New Password
-                        </label>
-                        <input
-                          type="password"
-                          className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                          Confirm Password
-                        </label>
-                        <input
-                          type="password"
-                          className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-blue-500"
-                        />
+                <div className="space-y-6">
+                  <div className="p-4 rounded-lg bg-slate-800/50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Shield className="w-5 h-5 text-blue-400" />
+                        <div>
+                          <p className="text-white font-medium">Authentication Provider</p>
+                          <p className="text-sm text-slate-400">
+                            Currently using: {session?.user?.authProvider || 'Email'}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                    <button type="submit" className="btn-primary">
-                      Update Password
-                    </button>
-                  </form>
-                </div>
+                  </div>
 
-                {/* Two-Factor Authentication */}
-                <div>
-                  <h4 className="text-lg font-medium text-white mb-4">Two-Factor Authentication</h4>
-                  <div className="flex items-center justify-between p-4 rounded-lg bg-slate-800/50">
-                    <div>
-                      <p className="text-white">2FA Status</p>
-                      <p className="text-sm text-slate-400">Add an extra layer of security to your account</p>
+                  <div className="p-4 rounded-lg bg-slate-800/50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Key className="w-5 h-5 text-green-400" />
+                        <div>
+                          <p className="text-white font-medium">Two-Factor Authentication</p>
+                          <p className="text-sm text-slate-400">Add an extra layer of security</p>
+                        </div>
+                      </div>
+                      <button className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                        Enable 2FA
+                      </button>
                     </div>
-                    <button className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-                      Enable 2FA
-                    </button>
                   </div>
                 </div>
               </div>
@@ -238,34 +415,13 @@ export default function ProfilePage() {
             <div className="glass rounded-2xl p-8">
               <h3 className="text-xl font-semibold text-white mb-6">API Keys</h3>
               
-              <div className="space-y-4 mb-6">
-                <div className="p-4 rounded-lg bg-slate-800/50">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <p className="text-white font-medium">Production API Key</p>
-                      <p className="text-sm text-slate-400">Created on Jan 15, 2024</p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <button className="p-2 text-slate-400 hover:text-white">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                      </button>
-                      <button className="p-2 text-red-400 hover:text-red-300">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                  <code className="text-xs text-slate-500">sk_live_********************************</code>
-                </div>
+              <div className="p-6 rounded-lg bg-slate-800/30 border-2 border-dashed border-slate-700 text-center">
+                <Key className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+                <p className="text-slate-400 mb-2">API key management coming soon</p>
+                <p className="text-sm text-slate-500">
+                  You'll be able to generate and manage API keys for programmatic access
+                </p>
               </div>
-
-              <button className="btn-primary">
-                Generate New API Key
-              </button>
             </div>
           )}
 
@@ -276,15 +432,18 @@ export default function ProfilePage() {
               
               <div className="space-y-6">
                 {[
-                  { name: 'Email Notifications', description: 'Receive updates via email' },
-                  { name: 'Usage Alerts', description: 'Get notified when reaching usage limits' },
-                  { name: 'Product Updates', description: 'New features and improvements' },
-                  { name: 'Security Alerts', description: 'Important security notifications' },
+                  { name: 'Email Notifications', description: 'Receive updates via email', icon: Mail },
+                  { name: 'Usage Alerts', description: 'Get notified when reaching usage limits', icon: Bell },
+                  { name: 'Product Updates', description: 'New features and improvements', icon: Bell },
+                  { name: 'Security Alerts', description: 'Important security notifications', icon: Shield },
                 ].map((item) => (
-                  <div key={item.name} className="flex items-center justify-between">
-                    <div>
-                      <p className="text-white font-medium">{item.name}</p>
-                      <p className="text-sm text-slate-400">{item.description}</p>
+                  <div key={item.name} className="flex items-center justify-between p-4 rounded-lg bg-slate-800/30">
+                    <div className="flex items-center gap-3">
+                      <item.icon className="w-5 h-5 text-slate-400" />
+                      <div>
+                        <p className="text-white font-medium">{item.name}</p>
+                        <p className="text-sm text-slate-400">{item.description}</p>
+                      </div>
                     </div>
                     <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                       <span className="translate-x-1 inline-block h-4 w-4 transform rounded-full bg-white transition-transform" />

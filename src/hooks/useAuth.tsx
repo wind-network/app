@@ -1,66 +1,56 @@
 'use client'
 
-import { usePrivy } from '@privy-io/react-auth'
 import { useRouter } from 'next/navigation'
+import { useSession, signOut } from 'next-auth/react'
 import { useEffect } from 'react'
 
 export function useAuth(requireAuth = false) {
-  const { user, ready, authenticated, login, logout } = usePrivy()
   const router = useRouter()
+  const { data: session, status } = useSession()
+  
+  const isAuthenticated = status === 'authenticated'
+  const isReady = status !== 'loading'
 
   useEffect(() => {
-    if (requireAuth && ready && !authenticated) {
-      router.push('/')
+    if (requireAuth && isReady && !isAuthenticated) {
+      router.push('/auth/signin')
     }
-  }, [requireAuth, ready, authenticated, router])
+  }, [requireAuth, isReady, isAuthenticated, router])
 
   const getUserDisplayName = () => {
-    if (!user) return 'User'
+    if (!session?.user) return 'User'
     
-    if (user.email) {
-      return user.email.address.split('@')[0]
+    if (session.user.name) {
+      return session.user.name
     }
     
-    if (user.wallet) {
-      return `${user.wallet.address.slice(0, 6)}...${user.wallet.address.slice(-4)}`
-    }
-    
-    if (user.google) {
-      return user.google.name || user.google.email.split('@')[0]
-    }
-    
-    if (user.github) {
-      return user.github.username
+    if (session.user.email) {
+      return session.user.email.split('@')[0]
     }
     
     return 'User'
   }
 
   const getUserEmail = () => {
-    if (!user) return ''
-    
-    if (user.email) return user.email.address
-    if (user.google) return user.google.email
-    
-    return ''
+    return session?.user?.email || ''
   }
 
   const getUserAvatar = () => {
-    if (!user) return null
-    
-    const userWithGoogle = user as unknown as { google?: { profilePictureUrl?: string } }
-    const userWithGithub = user as unknown as { github?: { profilePictureUrl?: string } }
-    
-    if (userWithGoogle.google?.profilePictureUrl) return userWithGoogle.google.profilePictureUrl
-    if (userWithGithub.github?.profilePictureUrl) return userWithGithub.github.profilePictureUrl
-    
-    return null
+    return session?.user?.image || null
+  }
+
+  const login = () => {
+    router.push('/auth/signin')
+  }
+
+  const logout = async () => {
+    await signOut({ callbackUrl: '/' })
   }
 
   return {
-    user,
-    ready,
-    authenticated,
+    user: session?.user || null,
+    ready: isReady,
+    authenticated: isAuthenticated,
     login,
     logout,
     getUserDisplayName,
