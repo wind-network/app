@@ -117,10 +117,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-8 h-8 rounded-lg gradient-blue flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M3 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm2 2V5h1v1H5zM3 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3zm2 2v-1h1v1H5zM13 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1V4zm2 2V5h1v1h-1z" clipRule="evenodd" />
-                </svg>
+              <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
+                <img 
+                  src="/logo.png" 
+                  alt="Wind Network Logo" 
+                  className="w-8 h-8 object-contain"
+                />
               </div>
               <span className="text-xl font-bold text-white">Wind Network</span>
             </Link>

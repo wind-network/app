@@ -31,15 +31,15 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Welcome back, {getUserDisplayName()}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Welcome back, {getUserDisplayName()}</h1>
           <p className="text-slate-400">Here&apos;s what&apos;s happening with your Wind Network services.</p>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
           {stats.map((stat, index) => (
             <motion.div
               key={stat.label}
@@ -49,7 +49,7 @@ export default function DashboardPage() {
               className="glass rounded-xl p-6"
             >
               <p className="text-sm text-slate-400 mb-2">{stat.label}</p>
-              <p className="text-2xl font-bold text-white mb-2">{stat.value}</p>
+              <p className="text-xl sm:text-2xl font-bold text-white mb-2">{stat.value}</p>
               <div className="flex items-center space-x-2">
                 <span className={`text-sm ${
                   stat.trend === 'up' ? 'text-green-400' :
@@ -81,8 +81,8 @@ export default function DashboardPage() {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="lg:col-span-2"
           >
-            <h2 className="text-xl font-semibold text-white mb-6">Quick Actions</h2>
-            <div className="grid sm:grid-cols-2 gap-4">
+            <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6">Quick Actions</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {quickActions.map((action) => (
                 <Link key={action.name} href={action.href}>
                   <motion.div
@@ -112,7 +112,7 @@ export default function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
           >
-            <h2 className="text-xl font-semibold text-white mb-6">Recent Activity</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6">Recent Activity</h2>
             <div className="glass rounded-xl p-6 space-y-4">
               {activities.map((activity) => (
                 <div key={activity.id} className="flex items-start space-x-3">
@@ -137,8 +137,8 @@ export default function DashboardPage() {
           transition={{ duration: 0.5, delay: 0.8 }}
           className="mt-8"
         >
-          <h2 className="text-xl font-semibold text-white mb-6">Service Status</h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6">Service Status</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             <div className="glass rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-white">Wind Network</h3>

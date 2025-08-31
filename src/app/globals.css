@@ -5,11 +5,51 @@
 :root {
   --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  
+  /* Fluid typography variables */
+  --fluid-min-width: 320;
+  --fluid-max-width: 1200;
+  --fluid-screen: 100vw;
+  --fluid-bp: calc((var(--fluid-screen) - var(--fluid-min-width) / 16 * 1rem) / (var(--fluid-max-width) - var(--fluid-min-width)));
 }
 
-/* Smooth scrolling for anchor links */
+/* Base font size with fluid scaling */
 html {
   scroll-behavior: smooth;
+  font-size: clamp(14px, 0.875rem + 0.15vw, 16px);
+}
+
+/* Ensure consistent box sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Prevent horizontal overflow and improve container responsiveness */
+body {
+  overflow-x: hidden;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Responsive container utilities */
+.container-fluid {
+  width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-fluid {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-fluid {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
 }
 
 /* Noise overlay */
@@ -188,10 +228,11 @@ html {
 
 /* Button animations */
 .btn-primary {
-  @apply relative inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white transition-all duration-300 ease-out overflow-hidden;
+  @apply relative inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white transition-all duration-300 ease-out overflow-hidden;
   background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-  border-radius: 12px;
+  border-radius: 0.5rem;
   box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+  font-size: clamp(0.875rem, 0.75rem + 0.5vw, 1.125rem);
 }
 
 .btn-primary::before {
@@ -215,8 +256,16 @@ html {
 }
 
 .btn-secondary {
-  @apply relative inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-blue-400 transition-all duration-300 ease-out overflow-hidden glass;
-  border-radius: 12px;
+  @apply relative inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-blue-400 transition-all duration-300 ease-out overflow-hidden glass;
+  border-radius: 0.5rem;
+  font-size: clamp(0.875rem, 0.75rem + 0.5vw, 1.125rem);
+}
+
+@media (min-width: 640px) {
+  .btn-primary,
+  .btn-secondary {
+    border-radius: 0.75rem;
+  }
 }
 
 .btn-secondary:hover {

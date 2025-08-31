@@ -1,13 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState } from 'react'
 import Link from 'next/link'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 
 export default function DropSpacePage() {
-  const [activeDemo, setActiveDemo] = useState(0)
   // Jupiter-themed animations
   const jupiterColors = {
     storms: ['#D4A574', '#C19660', '#8B6239', '#A0522D'],
@@ -114,8 +112,8 @@ export default function DropSpacePage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center px-6">
-        <div className="max-w-7xl mx-auto text-center">
+      <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto text-center w-full">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -126,20 +124,20 @@ export default function DropSpacePage() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="inline-flex items-center px-6 py-3 rounded-full mb-8"
+              className="inline-flex items-center px-3 sm:px-4 py-2 sm:py-3 rounded-full mb-6 sm:mb-8"
               style={{
                 background: 'linear-gradient(135deg, rgba(212, 165, 116, 0.2), rgba(139, 98, 57, 0.2))',
                 border: '1px solid rgba(212, 165, 116, 0.3)'
               }}
             >
               <span className="w-2 h-2 bg-orange-400 rounded-full mr-3 animate-pulse"></span>
-              <span className="text-sm font-medium text-orange-200">
+              <span className="text-xs sm:text-sm font-medium text-orange-200">
                 File Sharing for the Year 2050 • Built on Wind Space
               </span>
             </motion.div>
             
             {/* Title with Jupiter gradient */}
-            <h1 className="text-6xl lg:text-8xl font-bold mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight">
               <motion.span
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -162,7 +160,7 @@ export default function DropSpacePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="text-xl lg:text-2xl text-amber-100/80 mb-12 max-w-4xl mx-auto leading-relaxed"
+              className="text-sm sm:text-base lg:text-lg text-amber-100/80 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-2"
             >
               The Google Drive killer from the future. Share files at the speed of thought. 
               Encrypted, decentralized, and works across planets. No corporate overlords, 
@@ -174,32 +172,32 @@ export default function DropSpacePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-6"
+              className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-sm sm:max-w-none mx-auto"
             >
               <motion.a
                 href="https://dropspace.wind.network"
                 target="_blank"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-orange-500 to-amber-600 shadow-2xl shadow-orange-500/20 flex items-center"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold text-white bg-gradient-to-r from-orange-500 to-amber-600 shadow-lg shadow-orange-500/20 flex items-center justify-center w-full sm:w-auto min-w-0"
               >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 mr-1.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
-                Open DropSpace App
-                <span className="ml-2">🚀</span>
+                <span className="truncate">Open DropSpace App</span>
+                <span className="ml-1.5">🚀</span>
               </motion.a>
               
               <Link href="/dashboard/dropspace">
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 rounded-2xl font-semibold text-orange-300 border border-orange-400/30 bg-orange-900/20 backdrop-blur flex items-center"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold text-orange-300 border border-orange-400/30 bg-orange-900/20 backdrop-blur flex items-center justify-center w-full sm:w-auto min-w-0"
                 >
-                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-4 h-4 mr-1.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                   </svg>
-                  Dashboard View
+                  <span className="truncate">Dashboard View</span>
                 </motion.button>
               </Link>
             </motion.div>
@@ -219,7 +217,7 @@ export default function DropSpacePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.8 }}
-            className="mt-20 relative h-64"
+            className="mt-12 sm:mt-16 lg:mt-20 relative h-48 sm:h-56 lg:h-64"
           >
             {['📱', '💻', '🖥️', '⌚', '🎮'].map((device, i) => (
               <motion.div
@@ -233,9 +231,9 @@ export default function DropSpacePage() {
                   repeat: Infinity,
                   delay: i * 0.5,
                 }}
-                className="absolute text-4xl"
+                className="absolute text-2xl sm:text-3xl lg:text-4xl"
                 style={{
-                  left: `${20 + i * 15}%`,
+                  left: `${15 + i * 17.5}%`,
                   top: '50%',
                 }}
               >
@@ -247,23 +245,23 @@ export default function DropSpacePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-32 px-6">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-12 sm:py-16 lg:py-24 px-4 sm:px-6">
+        <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-20"
+            className="text-center mb-12 sm:mb-16"
           >
-            <h2 className="text-5xl font-bold mb-6">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4">
               File Sharing from the <span className="bg-gradient-to-r from-orange-400 to-amber-400 text-transparent bg-clip-text">Future</span>
             </h2>
-            <p className="text-xl text-amber-100/60 max-w-3xl mx-auto">
+            <p className="text-sm sm:text-base lg:text-lg text-amber-100/60 max-w-2xl mx-auto px-2">
               While others are stuck in 2025, we're building for 2050 and beyond
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {features.map((feature, index) => (
               <motion.div
                 key={index}
@@ -271,7 +269,7 @@ export default function DropSpacePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 whileHover={{ scale: 1.02, y: -5 }}
-                className="relative p-8 rounded-3xl overflow-hidden group"
+                className="relative p-4 sm:p-6 rounded-xl sm:rounded-2xl overflow-hidden group"
                 style={{
                   background: 'linear-gradient(135deg, rgba(212, 165, 116, 0.1), rgba(139, 98, 57, 0.05))',
                   border: '1px solid rgba(212, 165, 116, 0.2)'
@@ -282,15 +280,15 @@ export default function DropSpacePage() {
                 />
                 
                 <div className="relative z-10">
-                  <div className="text-5xl mb-6">{feature.icon}</div>
-                  <h3 className="text-2xl font-bold mb-4 text-orange-100">{feature.title}</h3>
-                  <p className="text-amber-100/70 mb-6 leading-relaxed">{feature.description}</p>
+                  <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">{feature.icon}</div>
+                  <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-orange-100">{feature.title}</h3>
+                  <p className="text-sm sm:text-base text-amber-100/70 mb-3 sm:mb-4 leading-relaxed">{feature.description}</p>
                   
                   <div className="flex flex-wrap gap-3">
                     {feature.stats.map((stat, idx) => (
                       <span 
                         key={idx} 
-                        className="px-4 py-2 rounded-full text-sm font-medium"
+                        className="px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium"
                         style={{
                           background: 'rgba(251, 191, 36, 0.1)',
                           color: '#FCD34D',
@@ -308,125 +306,100 @@ export default function DropSpacePage() {
         </div>
       </section>
 
-      {/* Demo Section */}
-      <section className="py-32 px-6" style={{ background: 'rgba(217, 119, 6, 0.05)' }}>
-        <div className="max-w-7xl mx-auto">
+      {/* Interactive Features Section */}
+      <section className="py-12 sm:py-16 lg:py-24 px-4 sm:px-6" style={{ background: 'rgba(217, 119, 6, 0.05)' }}>
+        <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-20"
+            className="text-center mb-8 sm:mb-12"
           >
-            <h2 className="text-5xl font-bold mb-6">
-              See the <span className="bg-gradient-to-r from-orange-400 to-amber-400 text-transparent bg-clip-text">Magic</span>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4">
+              How <span className="bg-gradient-to-r from-orange-400 to-amber-400 text-transparent bg-clip-text">DropSpace</span> Works
             </h2>
-            <p className="text-xl text-amber-100/60 max-w-3xl mx-auto">
-              Drop files like you're living in the future
+            <p className="text-sm sm:text-base lg:text-lg text-amber-100/60 max-w-2xl mx-auto px-2">
+              File sharing reimagined for the modern world
             </p>
           </motion.div>
 
-          {/* Interactive Demo Area */}
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Demo Selector */}
-            <div className="space-y-4">
-              {demos.map((demo, index) => (
-                <motion.button
-                  key={index}
-                  whileHover={{ x: 10 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setActiveDemo(index)}
-                  className={`w-full p-6 rounded-2xl text-left transition-all duration-300 ${
-                    activeDemo === index 
-                      ? 'bg-gradient-to-r from-orange-500/20 to-amber-500/20 border-orange-400' 
-                      : 'bg-orange-900/10 border-orange-800/30 hover:bg-orange-900/20'
-                  } border`}
-                >
-                  <h3 className="text-xl font-bold text-orange-100 mb-2">{demo.title}</h3>
-                  <p className="text-amber-100/60">{demo.description}</p>
-                  <div className="text-2xl mt-4">{demo.visual}</div>
-                </motion.button>
-              ))}
-            </div>
-
-            {/* Demo Visualization */}
-            <motion.div
-              key={activeDemo}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="relative h-96 rounded-3xl overflow-hidden"
-              style={{
-                background: 'linear-gradient(135deg, rgba(217, 119, 6, 0.1), rgba(245, 158, 11, 0.05))',
-                border: '1px solid rgba(251, 191, 36, 0.2)'
-              }}
-            >
-              <div className="absolute inset-0 flex items-center justify-center">
+          {/* How It Works Steps */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {demos.map((demo, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                whileHover={{ scale: 1.02, y: -5 }}
+                className="relative p-4 sm:p-6 rounded-xl sm:rounded-2xl overflow-hidden group text-center"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(212, 165, 116, 0.1), rgba(139, 98, 57, 0.05))',
+                  border: '1px solid rgba(212, 165, 116, 0.2)'
+                }}
+              >
                 <motion.div
-                  animate={{
-                    scale: [1, 1.2, 1],
-                    rotate: [0, 180, 360],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  className="text-8xl"
-                >
-                  {demos[activeDemo].visual.split(' → ')[1]}
-                </motion.div>
-              </div>
-            </motion.div>
+                  className="absolute inset-0 bg-gradient-to-br from-orange-400/10 to-amber-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                />
+                
+                <div className="relative z-10">
+                  <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">{demo.visual.split(' → ')[1]}</div>
+                  <div className="text-sm font-medium text-orange-300/60 mb-2">Step {index + 1}</div>
+                  <h3 className="text-base sm:text-lg font-bold mb-2 sm:mb-3 text-orange-100">{demo.title}</h3>
+                  <p className="text-xs sm:text-sm text-amber-100/70 leading-relaxed">{demo.description}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-32 px-6">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="py-12 sm:py-16 lg:py-24 px-4 sm:px-6">
+        <div className="max-w-3xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="p-12 rounded-3xl"
+            className="p-6 sm:p-8 rounded-xl sm:rounded-2xl"
             style={{
               background: 'linear-gradient(135deg, rgba(217, 119, 6, 0.2), rgba(180, 83, 9, 0.1))',
               border: '1px solid rgba(251, 191, 36, 0.3)'
             }}
           >
-            <h2 className="text-4xl font-bold mb-6 text-orange-100">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4 text-orange-100">
               Ready to Drop into the Future?
             </h2>
-            <p className="text-xl text-amber-100/70 mb-8">
+            <p className="text-sm sm:text-base lg:text-lg text-amber-100/70 mb-4 sm:mb-6 px-2">
               Join millions across the galaxy who've already ditched Big Tech
             </p>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
               <motion.a
                 href="https://dropspace.wind.network"
                 target="_blank"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-orange-500 to-amber-600 shadow-2xl shadow-orange-500/20 flex items-center"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold text-white bg-gradient-to-r from-orange-500 to-amber-600 shadow-lg shadow-orange-500/20 flex items-center justify-center w-full sm:w-auto min-w-0"
               >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 mr-1.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
-                Launch DropSpace App
+                <span className="truncate">Launch DropSpace App</span>
               </motion.a>
               
               <Link href="/dashboard/dropspace">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 rounded-2xl font-semibold text-orange-300 border border-orange-400/30 bg-orange-900/20"
+                  className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold text-orange-300 border border-orange-400/30 bg-orange-900/20 w-full sm:w-auto"
                 >
-                  Access Dashboard
+                  <span className="truncate">Access Dashboard</span>
                 </motion.button>
               </Link>
             </div>
 
-            <p className="mt-8 text-sm text-amber-100/50">
+            <p className="mt-4 sm:mt-6 text-xs sm:text-sm text-amber-100/50">
               No credit card • No tracking • No BS • Just pure file freedom 🚀
             </p>
           </motion.div>

@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
+import { useRouter } from 'next/navigation'
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { authenticated, login, logout } = useAuth()
+  const router = useRouter()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,6 +30,19 @@ export function Navbar() {
     { href: '/#pricing', label: 'Pricing' },
   ]
 
+  const handleLogin = () => {
+    // Always use NextAuth login page
+    router.push('/auth/signin')
+  }
+
+  const handleLogout = async () => {
+    try {
+      logout()
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
+  }
+
   return (
     <motion.nav
       initial={{ y: -100 }}
@@ -36,23 +51,25 @@ export function Navbar() {
         isScrolled ? 'glass py-4' : 'py-6'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         <Link href="/">
           <motion.div
             whileHover={{ scale: 1.05 }}
             className="flex items-center space-x-3 cursor-pointer"
           >
-            <div className="w-10 h-10 rounded-xl gradient-blue flex items-center justify-center animate-glow">
-              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M3 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm2 2V5h1v1H5zM3 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3zm2 2v-1h1v1H5zM13 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1V4zm2 2V5h1v1h-1z" clipRule="evenodd" />
-              </svg>
+            <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center">
+              <img 
+                src="/logo.png" 
+                alt="Wind Network Logo" 
+                className="w-10 h-10 object-contain"
+              />
             </div>
-            <span className="text-2xl font-bold text-gradient">Wind Network</span>
+            <span className="text-xl sm:text-2xl font-bold text-gradient">Wind Network</span>
           </motion.div>
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden lg:flex items-center space-x-8">
+        <div className="hidden lg:flex items-center space-x-6 xl:space-x-8">
           {navItems.map((item) => (
             item.isPage ? (
               <Link key={item.href} href={item.href}>
@@ -77,7 +94,7 @@ export function Navbar() {
         </div>
 
         {/* CTA Buttons */}
-        <div className="hidden lg:flex items-center space-x-4">
+        <div className="hidden lg:flex items-center space-x-3 xl:space-x-4">
           {authenticated ? (
             <>
               <Link href="/dashboard">
@@ -90,7 +107,7 @@ export function Navbar() {
                 </motion.button>
               </Link>
               <motion.button
-                onClick={() => logout()}
+                onClick={handleLogout}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="text-slate-300 hover:text-white"
@@ -99,14 +116,26 @@ export function Navbar() {
               </motion.button>
             </>
           ) : (
-            <motion.button
-              onClick={() => login()}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="btn-primary"
-            >
-              Login
-            </motion.button>
+            <>
+              <Link href="/auth/signin">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="btn-secondary"
+                >
+                  Sign In
+                </motion.button>
+              </Link>
+              <Link href="/auth/signup">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="btn-primary"
+                >
+                  Sign Up
+                </motion.button>
+              </Link>
+            </>
           )}
         </div>
 
@@ -130,7 +159,7 @@ export function Navbar() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="lg:hidden glass-strong mt-4 mx-6 rounded-2xl p-6"
+          className="lg:hidden glass-strong mt-4 mx-4 sm:mx-6 rounded-2xl p-4 sm:p-6"
         >
           <div className="flex flex-col space-y-4">
             {navItems.map((item) => (
@@ -168,7 +197,7 @@ export function Navbar() {
                   </Link>
                   <button
                     onClick={() => {
-                      logout()
+                      handleLogout()
                       setIsMobileMenuOpen(false)
                     }}
                     className="w-full text-center text-slate-300 hover:text-white py-2"
@@ -177,15 +206,24 @@ export function Navbar() {
                   </button>
                 </div>
               ) : (
-                <button
-                  onClick={() => {
-                    login()
-                    setIsMobileMenuOpen(false)
-                  }}
-                  className="btn-primary w-full text-center"
-                >
-                  Login
-                </button>
+                <div className="space-y-3">
+                  <Link
+                    href="/auth/signin"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span className="btn-secondary w-full text-center block">
+                      Sign In
+                    </span>
+                  </Link>
+                  <Link
+                    href="/auth/signup"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span className="btn-primary w-full text-center block">
+                      Sign Up
+                    </span>
+                  </Link>
+                </div>
               )}
             </div>
           </div>
