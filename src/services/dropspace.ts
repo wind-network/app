@@ -201,7 +201,7 @@ export class DropSpaceService {
     return shareLink
   }
 
-  static async downloadFile(shareId: string): void {
+  static async downloadFile(shareId: string): Promise<void> {
     const files = this.getStoredFiles()
     const file = files.find(f => f.id === shareId)
     

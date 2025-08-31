@@ -11,8 +11,8 @@ interface Plan {
   name: string
   displayName: string
   description?: string
-  priceMonthly: string
-  priceYearly: string
+  priceMonthly: string | null
+  priceYearly: string | null
   features: string[]
   limits: {
     storage: string | number
